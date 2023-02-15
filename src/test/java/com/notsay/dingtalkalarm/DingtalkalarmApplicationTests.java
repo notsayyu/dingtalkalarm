@@ -27,7 +27,7 @@ class DingtalkalarmApplicationTests {
         commands.add("df -h");
         commands.add("top -b -n 1");
 
-        Map<String, String> root = service.runDistanceShell(commands, "root", "hyperchain@dsy1", "118.31.59.77");
+        Map<String, String> root = service.runDistanceShell(commands, "root", "", "");
         System.out.println(root);
     }
 }
