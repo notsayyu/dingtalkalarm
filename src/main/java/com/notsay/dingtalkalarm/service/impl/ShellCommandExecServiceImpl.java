@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +26,7 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class ShellCommandExecServiceImpl implements ShellCommandExecService {
-    public static final String CPU_MEM_SHELL = "top -b -n 1";
-    public static final String FILES_SHELL = "df -hl";
-    public static final String[] COMMANDS = {CPU_MEM_SHELL, FILES_SHELL};
+
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static Session session;
 
@@ -149,6 +149,94 @@ public class ShellCommandExecServiceImpl implements ShellCommandExecService {
         }
         return map;
     }
+
+    /**
+     * 处理top命令 top -b -n 1
+     * //TODO 待完善和检查测试
+     *
+     * @param commandResult
+     */
+    @Override
+    public String disposeCpuMemShellResult(String commandResult) {
+        StringBuilder buffer = new StringBuilder();
+        String[] strings = commandResult.split(LINE_SEPARATOR);
+        //将返回结果按换行符分割
+        for (String line : strings) {
+            //转大写处理
+            line = line.toUpperCase();
+
+            //处理CPU Cpu(s): 10.8%us,  0.9%sy,  0.0%ni, 87.6%id,  0.7%wa,  0.0%hi,  0.0%si,  0.0%st
+            if (line.startsWith("CPU(S):")) {
+                String cpuStr = "CPU 用户使用占有率:";
+                try {
+                    cpuStr += line.split(":")[1].split(",")[0].replace("US", "");
+                } catch (Exception e) {
+                    log.error("计算cpu占用出错", e);
+                    cpuStr += "计算过程出错";
+                }
+                buffer.append(cpuStr).append(LINE_SEPARATOR);
+
+                //处理内存 Mem:  66100704k total, 65323404k used,   777300k free,    89940k buffers
+            } else if (line.startsWith("MEM")) {
+                String memStr = "内存使用情况:";
+                try {
+                    memStr += line.split(":")[1]
+                            .replace("TOTAL", "总计")
+                            .replace("USED", "已使用")
+                            .replace("FREE", "空闲")
+                            .replace("BUFFERS", "缓存");
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    memStr += "计算过程出错";
+                    buffer.append(memStr).append(LINE_SEPARATOR);
+                    continue;
+                }
+                buffer.append(memStr).append(LINE_SEPARATOR);
+
+            }
+        }
+        return buffer.toString();
+    }
+
+    /**
+     * 处理内存统计命令 free -m
+     *
+     * @param commandResult
+     */
+    @Override
+    public String disposeMemShellResult(String commandResult) {
+        String[] strings = commandResult.split(LINE_SEPARATOR);
+        try {
+            for (String result : strings) {
+                if (result.startsWith("Mem")) {
+                    String numLine = result.split(":")[1];
+                    String[] nums = numLine.trim().split("\\s+");
+                    BigDecimal total = new BigDecimal(nums[0]);
+                    BigDecimal available = new BigDecimal(nums[5]);
+                    BigDecimal vacancyRate = available.divide(total, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+
+                    BigDecimal rating = new BigDecimal("100").subtract(vacancyRate);
+                    log.info("内存使用率为:{}", rating);
+                    return rating.toString();
+                }
+            }
+        } catch (Exception e) {
+            log.error("计算内存使用率出错", e);
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        String s = "Mem:           1838         262         197          19        1378        1365";
+        String num = s.split(":")[1];
+        String[] nums = num.trim().split("\\s+");
+        System.out.println(num);
+    }
+
+    /**
+     * 执行命令解析：CPU_MEM_SHELL   top -b -n 1
+     */
 
 
     /**

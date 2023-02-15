@@ -29,4 +29,14 @@ public interface ShellCommandExecService {
      * @return 执行结果信息
      */
     Map<String, String> runLocalShell(List<String> commands);
+
+    /**
+     * 处理top命令 top -b -n 1
+     */
+    String disposeCpuMemShellResult(String commandResult);
+
+    /**
+     * 处理内存统计命令 free -m
+     */
+    String disposeMemShellResult(String commandResult);
 }

@@ -31,7 +31,10 @@ public class ShellController {
 
     @PostMapping("/distance")
     public Map<String, String> distance(@RequestBody ShellDistanceParam param) {
-        return shellCommandExecService.runDistanceShell(param.getCommandList(), param.getUser(), param.getPasswd(), param.getHost());
+        Map<String, String> stringStringMap = shellCommandExecService.runDistanceShell(param.getCommandList(), param.getUser(), param.getPasswd(), param.getHost());
+        String rating = shellCommandExecService.disposeMemShellResult(stringStringMap.get("free -m"));
+        System.out.println("内存使用率为: " + rating);
+        return stringStringMap;
     }
 
 }
