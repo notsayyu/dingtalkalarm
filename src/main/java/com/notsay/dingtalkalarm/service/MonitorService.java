@@ -11,4 +11,10 @@ public interface MonitorService {
      * 检查服务运行状态
      */
     void monitorServerStatus();
+
+    /**
+     * 监测服务器硬件资源
+     */
+    void ecsMonitor();
+
 }

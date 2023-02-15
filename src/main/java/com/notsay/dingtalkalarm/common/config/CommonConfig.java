@@ -21,7 +21,7 @@ public class CommonConfig {
     /**
      * 健康地址
      */
-    @Value("${health.url}")
+    @Value("${server.health.url}")
     private String healthUrl;
 
 
@@ -30,4 +30,16 @@ public class CommonConfig {
      */
     @Value("${app.name}")
     private String appName;
+
+    /**
+     * 检查内存使用的命令
+     */
+    @Value("${memory.used.command}")
+    private String memoryUsedCommand;
+
+    /**
+     * 检查磁盘使用的命令
+     */
+    @Value("${disk.used.command}")
+    private String diskUsedCommand;
 }

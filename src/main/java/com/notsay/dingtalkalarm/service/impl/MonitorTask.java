@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @Description TODO
  * @Date 2022/9/20 16:39
  */
-@Component
+//@Component
 @Slf4j
 public class MonitorTask {
 
@@ -22,12 +22,24 @@ public class MonitorTask {
     /**
      * 监测服务运行状态
      */
-    @Scheduled(cron = "${monitor.cron}")
-    public void updateWarranty() {
+    @Scheduled(cron = "${server.status.monitor.cron}")
+    public void serverStatusMonitor() {
         long startTime = System.currentTimeMillis();
         log.info("*** 监测服务运行状态开始，当前时间:[{}]", startTime);
         monitorService.monitorServerStatus();
         long endTime = System.currentTimeMillis();
         log.info("*** 监测服务运行状态结束，当前时间:[{}],执行时间为[{}]", endTime, endTime - startTime);
+    }
+
+    /**
+     * 监测服务器硬件资源
+     */
+    @Scheduled(cron = "${ecs.used.monitor.cron}")
+    public void ecsMonitor() {
+        long startTime = System.currentTimeMillis();
+        log.info("*** 监测服务器硬件资源开始，当前时间:[{}]", startTime);
+        monitorService.monitorServerStatus();
+        long endTime = System.currentTimeMillis();
+        log.info("*** 监测服务器硬件资源结束，当前时间:[{}],执行时间为[{}]", endTime, endTime - startTime);
     }
 }
