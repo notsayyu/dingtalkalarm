@@ -224,7 +224,7 @@ public class ShellCommandExecServiceImpl implements ShellCommandExecService {
                     BigDecimal available = new BigDecimal(nums[5]);
                     BigDecimal vacancyRate = available.divide(total, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
 
-                    BigDecimal rating = new BigDecimal("100").subtract(vacancyRate);
+                    BigDecimal rating = new BigDecimal("100").subtract(vacancyRate).setScale(2, RoundingMode.HALF_UP);
                     log.info("内存使用率为:{}", rating);
                     return rating.toString();
                 }

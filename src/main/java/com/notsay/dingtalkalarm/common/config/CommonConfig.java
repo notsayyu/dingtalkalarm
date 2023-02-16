@@ -31,4 +31,22 @@ public class CommonConfig {
      */
     @Value("${app.name}")
     private String appName;
+
+    /**
+     * 服务器内存使用率阈值
+     */
+    @Value("${ecs.mem.used.threshold}")
+    private String memUsedThreshold;
+
+    /**
+     * 服务器磁盘使用率阈值
+     */
+    @Value("${ecs.disk.used.threshold}")
+    private String diskUsedThreshold;
+
+    /**
+     * 所监控的服务器ip
+     */
+    @Value("${ecs.used.monitor.ip}")
+    private String ecsIp;
 }

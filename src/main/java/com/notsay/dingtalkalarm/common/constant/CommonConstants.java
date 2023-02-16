@@ -16,11 +16,11 @@ public class CommonConstants {
     /**
      * 查询磁盘命令
      */
-    public static final String FILES_SHELL = "df -hl";
+    public static final String DISK_SHELL = "df -hl";
 
     /**
      * 查询内存占用命令
      */
-    public static final String MEMORY_SHELL = "free -m";
+    public static final String MEM_SHELL = "free -m";
 
 }
