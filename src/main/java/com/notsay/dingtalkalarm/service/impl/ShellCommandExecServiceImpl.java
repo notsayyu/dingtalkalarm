@@ -4,6 +4,7 @@ import com.jcraft.jsch.*;
 import com.notsay.dingtalkalarm.service.ShellCommandExecService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -201,11 +202,18 @@ public class ShellCommandExecServiceImpl implements ShellCommandExecService {
 
     /**
      * 处理内存统计命令 free -m
+     * <p>
+     * total        used        free      shared  buff/cache   available
+     * Mem:           1838         260         192          19        1385        1367
+     * Swap:             0           0           0
      *
      * @param commandResult
      */
     @Override
     public String disposeMemShellResult(String commandResult) {
+        if (!StringUtils.hasText(commandResult)) {
+            return null;
+        }
         String[] strings = commandResult.split(LINE_SEPARATOR);
         try {
             for (String result : strings) {
@@ -227,17 +235,47 @@ public class ShellCommandExecServiceImpl implements ShellCommandExecService {
         return null;
     }
 
+    /**
+     * 处理内存统计命令 df -hl
+     * Filesystem      Size  Used Avail Use% Mounted on
+     * /dev/vda1        40G   20G   18G  53% /
+     * devtmpfs        909M     0  909M   0% /dev
+     * tmpfs           920M   19M  901M   3% /dev/shm
+     * tmpfs           920M  616K  919M   1% /run
+     * tmpfs           920M     0  920M   0% /sys/fs/cgroup
+     * tmpfs           184M     0  184M   0% /run/user/0
+     * overlay          40G   20G   18G  53% /var/lib/docker/overlay2/2b4b7ac9502adee20a8aceade720af387a9148113f1487d9b31664ad481f702f/merged
+     *
+     * @param commandResult
+     */
+    @Override
+    public String disposeDiskShellResult(String commandResult) {
+        if (!StringUtils.hasText(commandResult)) {
+            return null;
+        }
+        String[] strings = commandResult.split(LINE_SEPARATOR);
+        try {
+            for (String result : strings) {
+                if (result.endsWith("/")) {
+                    String[] nums = result.trim().split("\\s+");
+                    String ratingString = nums[4];
+
+                    log.info("系统磁盘使用率为:{}", ratingString);
+                    return ratingString.substring(0, ratingString.length() - 1);
+                }
+            }
+        } catch (Exception e) {
+            log.error("计算系统磁盘使用率出错", e);
+        }
+        return null;
+    }
+
     public static void main(String[] args) {
         String s = "Mem:           1838         262         197          19        1378        1365";
         String num = s.split(":")[1];
         String[] nums = num.trim().split("\\s+");
         System.out.println(num);
     }
-
-    /**
-     * 执行命令解析：CPU_MEM_SHELL   top -b -n 1
-     */
-
 
     /**
      * 连接到指定的HOST

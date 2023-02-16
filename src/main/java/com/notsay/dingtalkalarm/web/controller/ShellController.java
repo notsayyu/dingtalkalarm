@@ -34,6 +34,9 @@ public class ShellController {
         Map<String, String> stringStringMap = shellCommandExecService.runDistanceShell(param.getCommandList(), param.getUser(), param.getPasswd(), param.getHost());
         String rating = shellCommandExecService.disposeMemShellResult(stringStringMap.get("free -m"));
         System.out.println("内存使用率为: " + rating);
+
+        String diskRate = shellCommandExecService.disposeDiskShellResult(stringStringMap.get("df -hl"));
+        System.out.println("磁盘使用率为：" + diskRate);
         return stringStringMap;
     }
 

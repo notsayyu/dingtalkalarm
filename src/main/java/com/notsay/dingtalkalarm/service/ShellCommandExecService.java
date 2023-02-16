@@ -39,4 +39,9 @@ public interface ShellCommandExecService {
      * 处理内存统计命令 free -m
      */
     String disposeMemShellResult(String commandResult);
+
+    /**
+     * 处理内存统计命令 free -m
+     */
+    String disposeDiskShellResult(String commandResult);
 }
